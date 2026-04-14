@@ -10,10 +10,13 @@ const Layout = ({children, menu = "", submenu = ""}) => {
     <Header />
 
     {/* NAVIGATION */}
-    <Navigation menu={menu} submenu={submenu} navigationList={[navList]} />
+    <Navigation menu={menu} submenu={submenu} navigationList={navList} />
 
     {/* BODY */}
+    <div className='wrapper'>
     {children}
+    </div>
+
     </>
   )
 }

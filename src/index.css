@@ -256,7 +256,7 @@
 
 @layer components {
   .wrapper {
-    @apply relative ml-10 min-h-[100dvh] pr-6 pl-4 pt-[58px] transition-all duration-150 ease-linear print:pt-0;
+    @apply relative ml-58 min-h-[100dvh] pr-6 pl-4 pt-[80px] transition-all duration-150 ease-linear print:pt-0;
   }
 
   .navigation {

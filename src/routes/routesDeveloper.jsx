@@ -5,6 +5,11 @@ export const routerDeveloper = [
     {
         path:`${devNavUrl}/${urlDeveloper}/`,
         element: <>
+        </>
+    },
+    {
+        path:`${devNavUrl}/${urlDeveloper}/settings/users/roles`,
+        element: <>
         <Roles />
         </>
     },

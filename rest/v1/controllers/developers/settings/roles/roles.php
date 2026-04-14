@@ -1,9 +1,9 @@
 <?php
 
 // Set http header
-require '../../../core/header.php';
+require '../../../../core/header.php';
 // Use needed functions
-require '../../../core/function.php';
+require '../../../../core/function.php';
 
 
 // Get payload from frontend
