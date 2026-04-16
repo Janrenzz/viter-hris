@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 require 'Database.php';
 require 'Response.php';
@@ -11,18 +11,18 @@ function sendResponse($result) {
     $response->send();
 }
 
-function checkDbConnection() {
-    try {
+function checkDbConnection(){
+    try{
         $conn = Database::connectDb();
         return $conn;
-    } catch(PDOException $error) {
-        $error = [];
-        $error['type'] = "Invalid_reqest error";
-        $error['success'] = false;
-        $error['error'] = "Database connnection failed";
+    }catch(PDOException $error){
         $response = new Response();
+        $error = [];
+        $error['type'] = "invalid_request_error";
+        $error['success'] = false;
+        $error['error'] = "Database connection failed.";
         $response->setSuccess(false);
-        $response->setData($$error);
+        $response->setData($error);
         $response->send();
         exit;
     }
@@ -32,7 +32,7 @@ function checkApiKey()
 {
     // validate apikey
     http_response_code(200);
-    $apiKey = require __DIR__ . '/../../../apikey.php';
+    $apiKey = require _DIR_ . '/../../../apikey.php';
     // $apiKey = require $_SERVER["DOCUMENT_ROOT"] . '/../../apikey.php';
     $auth_array = explode(" ", $_SERVER['HTTP_AUTHORIZATION']);
     $un_pw = explode(":", base64_decode($auth_array[1]));
@@ -326,6 +326,7 @@ function getResultData($query)
     $data = $query->fetchAll();
     return $data;
 }
+
 
 // forbidden access
 function checkAccess()

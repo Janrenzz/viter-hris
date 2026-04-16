@@ -6,13 +6,6 @@ class Response {
     private $_toCache = false;
     private $_responseData = array();
 
-
-    public function __construct() {
-        $this->_success = false;
-        $this->_statusCode = 400;
-        $this->_data = null;
-    }
-
     public function setSuccess($success) {
         $this->_success = $success;
     }

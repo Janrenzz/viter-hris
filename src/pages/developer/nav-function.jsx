@@ -1,5 +1,5 @@
 import { FaCogs, FaUsers } from "react-icons/fa";
-import { devNavUrl } from "../../functions/functions-general";
+import { devNavUrl, urlDeveloper } from "../../functions/functions-general";
 import { MdDashboard } from "react-icons/md";
 
 export const navList = [
@@ -7,14 +7,14 @@ export const navList = [
     label: "Dashboard",
     icon: <MdDashboard />,
     menu: "dashboard",
-    path: `${devNavUrl}/dashboard`,
+    path: `${devNavUrl}/${urlDeveloper}/dashboard`,
     submenu: "",
   },
   {
     label: "Employees",
     icon: <FaUsers />,
     menu: "employees",
-    path: `${devNavUrl}/employees`,
+    path: `${devNavUrl}/${urlDeveloper}/employees`,
     submenu: "",
   },
   {
