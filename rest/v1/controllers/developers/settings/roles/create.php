@@ -7,13 +7,14 @@ $conn = checkDbConnection($conn);
 $val = new Roles($conn);
 
 $val->role_is_active = 1;
-$val->role_name = trim($data['role_name']);
-$val->role_description = $data['role_description'];
+$val->role_first_name = trim($data['role_first_name']);
+$val->role_last_name = trim($data['role_last_name']);
+$val->role_email = trim($data['role_email']);
 $val->role_created = date("Y-m-d H:m:s");
 $val->role_updated = date("Y-m-d H:m:s");
 
 // VALIDATIONS
-isNameExist($val, $val->role_name);
+isNameExist($val, $val->role_first_name);
 
 $query = checkCreate($val);
 http_response_code(200);

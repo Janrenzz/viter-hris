@@ -27,7 +27,7 @@ const Navigation = ({ navigationList = [], menu = "", submenu = "" }) => {
           <div className="text-sm text-white flex flex-col justify-between h-full">
             <ul>
               {navigationList?.map((item, key) => {
-                console.log(item);
+                // console.log(item);
                 return (
                   <li key={key} className={`h-fit flex items-center gap-2 ${item.subNavList && "flex-col gap-0.5!"}`}>
                     {item.subNavList ? (<NavigationAccordions subNavList={item.subNavList}
