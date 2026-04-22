@@ -1,5 +1,5 @@
 import React from "react";
-import Layout from "../../Layout";
+import Layout from "../../layout";
 import UsersList from "./UsersList";
 import { StoreContext } from "../../../../store/StoreContext";
 import { setIsAdd } from "../../../../store/StoreAction";
@@ -47,13 +47,13 @@ const Users = () => {
                 className="flex items-center gap-1 hover:underline"
                 onClick={handleAdd}
               >
-                <FaPlus />
+                <FaPlus className="text-primary" />
                 Add
               </button>
             )}
           </div>
         </div>
-        {/* PAGE CONTENT */}
+        {/* Page Content */}
         <div>
           <UsersList itemEdit={itemEdit} setItemEdit={setItemEdit} />
         </div>
@@ -63,7 +63,7 @@ const Users = () => {
         <ModalAddUsers
           itemEdit={itemEdit}
           filterArrayActiveRoles={filterArrayActiveRoles}
-        ></ModalAddUsers>
+        />
       )}
     </>
   );

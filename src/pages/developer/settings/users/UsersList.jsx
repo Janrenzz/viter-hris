@@ -18,16 +18,36 @@ import {
 import Status from "../../../../partials/Status";
 import ModalArchive from "../../../../partials/modals/ModalArchive";
 import ModalRestore from "../../../../partials/modals/ModalRestore";
-import ModalDelete from "../../../../partials/modals/ModalDelete";
 import { useInView } from "react-intersection-observer";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { queryDataInfinite } from "../../../../functions/custom-hooks/queryDataInfinite";
 import ServerError from "../../../../partials/ServerError";
 import Loadmore from "../../../../partials/Loadmore";
+import ModalDelete from "../../../../partials/modals/ModalDelete";
 import SearchBar from "../../../../partials/spinners/SearchBar";
 
 const UsersList = ({ itemEdit, setItemEdit }) => {
   const { store, dispatch } = React.useContext(StoreContext);
+
+  const handleEdit = (item) => {
+    dispatch(setIsAdd(true));
+    setItemEdit(item);
+  };
+
+  const handleArchive = (item) => {
+    dispatch(setIsArchive(true));
+    setItemEdit(item);
+  };
+
+  const handleRestore = (item) => {
+    dispatch(setIsRestore(true));
+    setItemEdit(item);
+  };
+
+  const handleDelete = (item) => {
+    dispatch(setIsDelete(true));
+    setItemEdit(item);
+  };
 
   const [page, setPage] = React.useState(1);
   const [filterData, setFilterData] = React.useState("");
@@ -61,27 +81,27 @@ const UsersList = ({ itemEdit, setItemEdit }) => {
       if (lastPage.page < lastPage.total) {
         return lastPage.page + lastPage.count;
       }
-      return;
+      return undefined;
     },
     refetchOnWindowFocus: false,
+    initialPageParam: 1,
   });
 
   React.useEffect(() => {
-    if (inView) {
+    if (inView && hasNextPage && !isFetchingNextPage) {
       setPage((prev) => prev + 1);
       fetchNextPage();
     }
-  }, [inView, fetchNextPage]);
+  }, [inView]);
 
   return (
     <>
-      <div className="p-5 flex item-center justify-between">
+      <div className="flex items-center justify-between">
         <div className="relative">
           <label htmlFor="">Status</label>
           <select
-            name="status"
-            id=""
             onChange={(e) => setFilterData(e.target.value)}
+            value={filterData}
           >
             <option value="">All</option>
             <option value="1">Active</option>
@@ -92,15 +112,16 @@ const UsersList = ({ itemEdit, setItemEdit }) => {
           search={search}
           dispatch={dispatch}
           store={store}
-          result={result?.pages}
+          result={result}
           isFetching={isFetching}
           setOnSearch={setOnSearch}
           onSearch={onSearch}
         />
       </div>
 
-      <div className="relative">
+      <div className="relative pt-4 rounded-md">
         {status !== "pending" && isFetching && <FetchingSpinner />}
+
         <table>
           <thead>
             <tr>
@@ -111,15 +132,16 @@ const UsersList = ({ itemEdit, setItemEdit }) => {
               <th>Role</th>
               <th>Created</th>
               <th>Updated</th>
+              <th></th>
             </tr>
           </thead>
+
           <tbody>
-            {/* loading screen for first page load */}
             {!error &&
-              (status == "pending" || result?.pages[0]?.count == 0) && (
+              (status === "pending" || result?.pages?.[0]?.count == 0) && (
                 <tr>
                   <td colSpan="100%" className="p-10">
-                    {status == "pending" ? (
+                    {status === "pending" ? (
                       <TableLoading cols={2} count={20} />
                     ) : (
                       <NoData />
@@ -127,21 +149,22 @@ const UsersList = ({ itemEdit, setItemEdit }) => {
                   </td>
                 </tr>
               )}
-            {/* IF REQUEST API FAILED */}
-            {!error && (
+
+            {error && (
               <tr>
                 <td colSpan="100%" className="p-10">
                   <ServerError />
                 </td>
               </tr>
             )}
-            {/* IF REQUEST API SUCCESS AND DATA EXIST THEN SHOW */}
-            {result?.pages.map((pages, key) => (
-              <React.Fragment key={key}>
-                {pages?.data?.map((item, key) => {
+
+            {result?.pages?.map((pageData, pageIndex) => (
+              <React.Fragment key={pageIndex}>
+                {pageData?.data?.map((item, key) => {
                   return (
                     <tr key={key}>
                       <td>{counter++}</td>
+
                       <td>
                         <Status
                           text={
@@ -149,12 +172,64 @@ const UsersList = ({ itemEdit, setItemEdit }) => {
                           }
                         />
                       </td>
+
                       <td>
                         {item.users_first_name} {item.users_last_name}
                       </td>
+
+                      <td>{item.users_email}</td>
+
                       <td>{item.role_name}</td>
+
                       <td>{formatDate(item.users_created)}</td>
+
                       <td>{formatDate(item.users_updated)}</td>
+
+                      <td>
+                        <div className="flex items-center gap-3">
+                          {item.users_is_active == 1 ? (
+                            <>
+                              <button
+                                type="button"
+                                className="tooltip-action-table"
+                                data-tooltip="Edit"
+                                onClick={() => handleEdit(item)}
+                              >
+                                <FaEdit />
+                              </button>
+
+                              <button
+                                type="button"
+                                className="tooltip-action-table"
+                                data-tooltip="Archive"
+                                onClick={() => handleArchive(item)}
+                              >
+                                <FaArchive />
+                              </button>
+                            </>
+                          ) : (
+                            <>
+                              <button
+                                type="button"
+                                className="tooltip-action-table"
+                                data-tooltip="Restore"
+                                onClick={() => handleRestore(item)}
+                              >
+                                <FaTrashRestore />
+                              </button>
+
+                              <button
+                                type="button"
+                                className="tooltip-action-table"
+                                data-tooltip="Delete"
+                                onClick={() => handleDelete(item)}
+                              >
+                                <FaTrash />
+                              </button>
+                            </>
+                          )}
+                        </div>
+                      </td>
                     </tr>
                   );
                 })}
@@ -162,19 +237,53 @@ const UsersList = ({ itemEdit, setItemEdit }) => {
             ))}
           </tbody>
         </table>
+
         <div className="loadmore flex justify-center flex-col items-center pb-10">
           <Loadmore
             fetchNextPage={fetchNextPage}
             isFetchingNextPage={isFetchingNextPage}
             hasNextPage={hasNextPage}
-            result={result?.pages[0]}
+            result={result?.pages?.[0]}
             setPage={setPage}
             page={page}
             refView={ref}
-            isSearchOrFilter={store.isSearch || store?.isFilter}
+            isSearchOrFilter={store.isSearch || result?.isFilter}
           />
         </div>
       </div>
+
+      {store.isArchive && itemEdit && (
+        <ModalArchive
+          mysqlApiArchive={`${apiVersion}/controllers/developers/settings/users/active.php?id=${itemEdit.users_aid}`}
+          msg="Are you sure you want to archive this record?"
+          successMsg="Successfully archived."
+          item={`${itemEdit.users_first_name} ${itemEdit.users_last_name}`}
+          dataItem={itemEdit}
+          queryKey="users"
+        />
+      )}
+
+      {store.isRestore && itemEdit && (
+        <ModalRestore
+          mysqlApiRestore={`${apiVersion}/controllers/developers/settings/users/active.php?id=${itemEdit.users_aid}`}
+          msg="Are you sure you want to restore this record?"
+          successMsg="Successfully restored."
+          item={`${itemEdit.users_first_name} ${itemEdit.users_last_name}`}
+          dataItem={itemEdit}
+          queryKey="users"
+        />
+      )}
+
+      {store.isDelete && itemEdit && (
+        <ModalDelete
+          mysqlApiDelete={`${apiVersion}/controllers/developers/settings/users/delete.php?id=${itemEdit.users_aid}`}
+          msg="Are you sure you want to delete this record?"
+          successMsg="Successfully deleted."
+          item={`${itemEdit.users_first_name} ${itemEdit.users_last_name}`}
+          dataItem={itemEdit}
+          queryKey="users"
+        />
+      )}
     </>
   );
 };

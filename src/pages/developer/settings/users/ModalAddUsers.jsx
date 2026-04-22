@@ -1,8 +1,7 @@
 import React from "react";
-import * as Yup from "yup";
 import { StoreContext } from "../../../../store/StoreContext";
+import * as Yup from "yup";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { queryData } from "../../../../functions/custom-hooks/queryData";
 import { apiVersion } from "../../../../functions/functions-general";
 import {
   setError,
@@ -20,6 +19,7 @@ import {
 } from "../../../../components/form-input/FormInputs";
 import ButtonSpinner from "../../../../partials/spinners/ButtonSpinner";
 import MessageError from "../../../../partials/MessageError";
+import { queryData } from "../../../../functions/custom-hooks/queryData";
 
 const ModalAddUsers = ({ itemEdit, filterArrayActiveRoles }) => {
   const { store, dispatch } = React.useContext(StoreContext);
@@ -36,15 +36,15 @@ const ModalAddUsers = ({ itemEdit, filterArrayActiveRoles }) => {
         itemEdit ? "PUT" : "POST",
         values,
       ),
-
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["roles"] });
+      queryClient.invalidateQueries({ queryKey: ["users"] });
 
       if (data.success) {
         dispatch(setSuccess(true));
         dispatch(setIsAdd(false));
         dispatch(setMessage(`Succesfully ${itemEdit ? "updated" : "added"}`));
       }
+
       if (data.success == false) {
         dispatch(setError(true));
         dispatch(setMessage(data.error));
@@ -59,8 +59,7 @@ const ModalAddUsers = ({ itemEdit, filterArrayActiveRoles }) => {
     users_last_name: itemEdit ? itemEdit.users_last_name : "",
     users_password: itemEdit ? itemEdit.users_password : "",
     users_email: itemEdit ? itemEdit.users_email : "",
-
-    users_email_id_old: itemEdit ? itemEdit.users_email : "",
+    users_email_old: itemEdit ? itemEdit.users_email : "",
   };
 
   const yupSchema = Yup.object({
@@ -80,31 +79,32 @@ const ModalAddUsers = ({ itemEdit, filterArrayActiveRoles }) => {
   React.useEffect(() => {
     dispatch(setError(false));
   }, []);
+
   return (
     <>
       <ModalWrapperSide
         handleClose={handleClose}
         className="transition-all ease-in-out transform duration-200"
       >
-        {/* Header */}
         <div className="modal-header relative mb-4">
           <h3 className="text-dark text-sm">
             {itemEdit ? "Update" : "Add"} Users
-            <button
-              type="button"
-              className="absolute top-0 right-4"
-              onClick={handleClose}
-            >
-              <FaTimes />
-            </button>
           </h3>
+          <button
+            type="button"
+            className="absolute right-4 top-0 cursor-pointer"
+            onClick={handleClose}
+          >
+            <FaTimes />
+          </button>
         </div>
-        {/* Body */}
+
         <div className="modal-body">
           <Formik
             initialValues={initVal}
             validationSchema={yupSchema}
             onSubmit={async (values, { setSubmitting, resetForm }) => {
+              dispatch(setError(false));
               mutation.mutate(values);
             }}
           >
@@ -115,32 +115,35 @@ const ModalAddUsers = ({ itemEdit, filterArrayActiveRoles }) => {
                     <div className="modal-container">
                       <div className="relative mb-6">
                         <InputText
-                          name="users_first_name"
                           label="First Name"
+                          name="users_first_name"
                           type="text"
                           disabled={mutation.isPending}
                         />
                       </div>
+
                       <div className="relative mt-5 mb-6">
                         <InputText
-                          name="users_last_name"
                           label="Last Name"
+                          name="users_last_name"
                           type="text"
                           disabled={mutation.isPending}
                         />
                       </div>
+
                       <div className="relative mt-5 mb-6">
                         <InputText
-                          name="users_email"
                           label="Email"
+                          name="users_email"
                           type="text"
                           disabled={mutation.isPending}
                         />
                       </div>
+
                       <div className="relative mt-5 mb-6">
                         <InputSelect
-                          name="users_role_id"
                           label="Role"
+                          name="users_role_id"
                           type="text"
                           disabled={mutation.isPending}
                         >
@@ -148,26 +151,25 @@ const ModalAddUsers = ({ itemEdit, filterArrayActiveRoles }) => {
                             <option value="" hidden>
                               --
                             </option>
-                            {filterArrayActiveRoles?.map((item, key) => {
+                            {filterArrayActiveRoles.map((item, key) => {
                               return (
                                 <option key={key} value={item.role_aid}>
-                                  {" "}
                                   {item.role_name}
                                 </option>
                               );
                             })}
-                            ;
                           </optgroup>
                         </InputSelect>
                       </div>
 
                       {store.error && <MessageError />}
                     </div>
+
                     <div className="modal-action">
                       <button
-                        className="btn-modal-submit"
                         type="submit"
                         disabled={mutation.isPending || !props.dirty}
+                        className="btn-modal-submit"
                       >
                         {mutation.isPending ? (
                           <ButtonSpinner />
@@ -177,7 +179,6 @@ const ModalAddUsers = ({ itemEdit, filterArrayActiveRoles }) => {
                           "Add"
                         )}
                       </button>
-
                       <button
                         type="reset"
                         className="btn-modal-cancel"

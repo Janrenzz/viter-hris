@@ -1,15 +1,15 @@
 <?php
-
+// check database connection
 $conn = null;
-$conn = checkDbConnection();
+$conn = checkDbConnection($conn);
+// make use of classes
 
-$val = new Roles($conn);
-
-if(empty($_GET)) {
+$val = new Users($conn);
+if(empty($_GET)){
     $query = checkReadAll($val);
     http_response_code(200);
     getQueriedData($query);
 }
 
-// Return 404 if endpoint not found
+// return404 if endpoint not found
 checkEndpoint();
